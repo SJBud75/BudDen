@@ -1,2 +1,0 @@
-# BudDen
-Private Chatbot
