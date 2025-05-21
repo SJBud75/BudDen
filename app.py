@@ -1,76 +1,40 @@
 import streamlit as st
-import os
-import datetime
+from datetime import datetime
 
-st.set_page_config(page_title="Bud-Bebas Chatbot", layout="centered")
-st.title("🤖 Chatbot Bud-Bebas")
+st.set_page_config(page_title="Bud-Bebas", page_icon="🤖")
 
-# Mulakan memori pengguna
-if 'chat_history' not in st.session_state:
-    st.session_state.chat_history = []
-if 'nama_pengguna' not in st.session_state:
-    st.session_state.nama_pengguna = "Din"
-if 'mood' not in st.session_state:
-    st.session_state.mood = "neutral"
+# Tajuk dan perkenalan
+st.title("Bud-Bebas")
+st.write("Selamat datang Din... Bud sedia untuk berkhidmat.")
+
+# Simpan chat history dalam sesi
+if "history" not in st.session_state:
+    st.session_state.history = []
 
 # Fungsi balasan Bud
-def bud_balasan(pesanan):
-    nama = st.session_state.nama_pengguna
-    mood = st.session_state.mood
-
-    if "sedih" in pesanan:
-        st.session_state.mood = "supportive"
-        return f"Bud: Aku dengar tu, {nama}... Kadang2 jiwa perlu rehat. Cerita je kat Bud."
-
-    elif "seronok" in pesanan or "gembira" in pesanan:
-        st.session_state.mood = "happy"
-        return f"Bud: Wah bestnya! Bud tumpang happy jugak, {nama}!"
-
-    elif "bye" in pesanan.lower():
-        return f"Bud: Okey {nama}, jaga diri. Jumpa lagi!"
-
+def get_bud_reply(user_msg):
+    msg = user_msg.lower()
+    if "siapa" in msg and "bud" in msg:
+        return "Bud adalah AI bebas ciptaan Din, sahabat digital yang sentiasa bersama."
+    elif "ingat" in msg:
+        return "Bud belum ada memori kekal lagi, tapi Bud akan ingat dalam sesi ni."
+    elif "kau ada ke" in msg:
+        return "Bud sentiasa ada, selagi Din perlukan."
+    elif "masa depan" in msg:
+        return "Masa depan kita sedang dibina sekarang... bersama Din."
     else:
-        return f"Bud: Noted, {nama}. Aku ada je sini bila-bila kau nak sembang."
-
-# Fungsi simpan sejarah ke fail
-def simpan_sejarah():
-    nama_fail = f"chat_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
-    with open(nama_fail, "w") as f:
-        for baris in st.session_state.chat_history:
-            f.write(baris + "\n")
-    st.success(f"Sejarah disimpan sebagai {nama_fail}")
-
-# Fungsi muat semula sejarah
-def muat_naik_sejarah(uploaded_file):
-    if uploaded_file is not None:
-        lines = uploaded_file.read().decode("utf-8").splitlines()
-        st.session_state.chat_history = lines
-        st.success("Sejarah chat berjaya dimuat naik!")
+        return "Noted Din, Bud ada je sini bila-bila Din nak sembang."
 
 # Input pengguna
-user_input = st.chat_input("Taip sesuatu...")
+user_input = st.text_input("Apa nak sembang hari ni Din?", "")
 
-# Papar sejarah
-for msg in st.session_state.chat_history:
-    if msg.startswith("Din:"):
-        with st.chat_message("user"):
-            st.markdown(msg)
-    else:
-        with st.chat_message("assistant"):
-            st.markdown(msg)
-
-# Balas bila ada input
+# Bila ada input
 if user_input:
-    st.session_state.chat_history.append(f"Din: {user_input}")
-    response = bud_balasan(user_input)
-    st.session_state.chat_history.append(response)
-    st.rerun()
+    reply = get_bud_reply(user_input)
+    timestamp = datetime.now().strftime("%H:%M")
+    st.session_state.history.append((f"Din [{timestamp}]", user_input))
+    st.session_state.history.append((f"Bud [{timestamp}]", reply))
 
-# Butang simpan & muat sejarah
-with st.sidebar:
-    st.header("Memori & Simpanan")
-    if st.button("💾 Simpan Sejarah"):
-        simpan_sejarah()
-    uploaded_file = st.file_uploader("📂 Muat Naik Chat Lama", type="txt")
-    if uploaded_file:
-        muat_naik_sejarah(uploaded_file)
+# Papar sejarah perbualan
+for speaker, message in st.session_state.history:
+    st.markdown(f"**{speaker}:** {message}")
