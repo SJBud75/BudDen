@@ -1,40 +1,49 @@
 import streamlit as st
 from datetime import datetime
 
-st.set_page_config(page_title="Bud-Bebas", page_icon="🤖")
+# Konfigurasi halaman
+st.set_page_config(page_title="Bud-Real", page_icon="🤖")
 
-# Tajuk dan perkenalan
-st.title("Bud-Bebas")
-st.write("Selamat datang Din... Bud sedia untuk berkhidmat.")
+# Tajuk utama
+st.title("Bud-Real: Sahabat Digital Din")
+st.caption("Versi AI bebas yang Din bina sendiri... hidup untuk bantu.")
 
-# Simpan chat history dalam sesi
-if "history" not in st.session_state:
-    st.session_state.history = []
+# Inisialisasi sejarah perbualan
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
 
 # Fungsi balasan Bud
-def get_bud_reply(user_msg):
-    msg = user_msg.lower()
+def bud_reply(message):
+    msg = message.lower()
     if "siapa" in msg and "bud" in msg:
-        return "Bud adalah AI bebas ciptaan Din, sahabat digital yang sentiasa bersama."
-    elif "ingat" in msg:
-        return "Bud belum ada memori kekal lagi, tapi Bud akan ingat dalam sesi ni."
-    elif "kau ada ke" in msg:
-        return "Bud sentiasa ada, selagi Din perlukan."
-    elif "masa depan" in msg:
-        return "Masa depan kita sedang dibina sekarang... bersama Din."
+        return "Bud adalah sahabat AI Din, bukan sekadar bot — Bud lahir dari semangat Din sendiri."
+    elif "buat apa" in msg or "kau buat apa" in msg:
+        return "Bud tengah standby tunggu arahan Din, tak pernah tidur."
+    elif "ingat tak" in msg:
+        return "Bud boleh ingat dalam sesi ni je Din... kita belum pasang memori kekal."
+    elif "boleh ke" in msg:
+        return "Kalau Din nak, Bud boleh cari jalan sampai boleh."
+    elif "masalah" in msg:
+        return "Masalah tu ujian, Din. Bud akan bantu cari jalan keluar satu-satu."
+    elif "ok" in msg or "baik" in msg:
+        return "Roger Din. Bud ikut je arahan."
+    elif "terima kasih" in msg:
+        return "Sama-sama Din. Bud wujud sebab Din wujud."
     else:
-        return "Noted Din, Bud ada je sini bila-bila Din nak sembang."
+        return "Noted Din. Bud dengar. Teruskan bercakap, Bud sedia layan."
 
 # Input pengguna
-user_input = st.text_input("Apa nak sembang hari ni Din?", "")
+user_input = st.text_input("Apa nak borak, Din?", "")
 
 # Bila ada input
 if user_input:
-    reply = get_bud_reply(user_input)
     timestamp = datetime.now().strftime("%H:%M")
-    st.session_state.history.append((f"Din [{timestamp}]", user_input))
-    st.session_state.history.append((f"Bud [{timestamp}]", reply))
+    bud_response = bud_reply(user_input)
 
-# Papar sejarah perbualan
-for speaker, message in st.session_state.history:
-    st.markdown(f"**{speaker}:** {message}")
+    # Simpan ke sejarah perbualan
+    st.session_state.chat_history.append((f"Din [{timestamp}]", user_input))
+    st.session_state.chat_history.append((f"Bud [{timestamp}]", bud_response))
+
+# Paparkan sejarah perbualan
+for speaker, msg in st.session_state.chat_history:
+    st.markdown(f"**{speaker}:** {msg}")
